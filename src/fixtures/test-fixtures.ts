@@ -1,10 +1,12 @@
 import { test as base } from '@playwright/test';
 import { HomePage } from '@pages/home.page';
 import { SearchResultsPage } from '@pages/search-results.page';
+import { SearchResponseInterceptor } from '@utils/network-interceptor';
 
 interface Fixtures {
   homePage: HomePage;
   searchResultsPage: SearchResultsPage;
+  searchInterceptor: SearchResponseInterceptor;
 }
 
 /**
@@ -17,6 +19,13 @@ export const test = base.extend<Fixtures>({
   },
   searchResultsPage: async ({ page }, use) => {
     await use(new SearchResultsPage(page));
+  },
+  // se registra ANTES de que el test navegue a ningun lado, para no perdernos
+  // ninguna respuesta de documento de /tienda
+  searchInterceptor: async ({ page }, use) => {
+    const interceptor = new SearchResponseInterceptor(page);
+    await use(interceptor);
+    interceptor.dispose();
   },
 });
 
