@@ -4,9 +4,9 @@
   "description": "E2E QA automation framework for the Liverpool.com.mx search flow, built with Playwright + TypeScript. Includes UI automation, network interception/cross-validation, HTML reporting and CI via GitHub Actions.",
   "main": "index.js",
   "scripts": {
-    "test": "playwright test",
-    "test:headed": "cross-env HEADED=true playwright test",
-    "test:chromium": "playwright test --project=chromium",
+    "test": "playwright test --project=chromium",
+    "test:headed": "cross-env HEADED=true playwright test --project=chromium",
+    "test:all-browsers": "playwright test",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug",
     "report": "playwright show-report",

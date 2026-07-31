@@ -37,17 +37,28 @@ npx playwright install --with-deps
 
 El último comando descarga los navegadores que usa Playwright (Chromium, Firefox y WebKit). Solo hace falta correrlo una vez.
 
+## ⚠️ Antes de correr las pruebas, lee esto
+
+Liverpool.com.mx usa **Akamai Bot Manager**, y durante el desarrollo confirmé que bloquea a Chromium específicamente cuando corre en modo `--headless` nativo (responde "Access Denied" directo, sin importar el user-agent ni otros ajustes anti-detección). En modo headed no hay ningún problema.
+
+Esto significa que si corres el comando headless (`npm test`) **desde tu propia máquina/red**, es muy probable que el sitio te bloquee — es un comportamiento del WAF de Liverpool, no un bug del framework, y está documentado a detalle en `TEST_STRATEGY.md`.
+
+Para verlo pasar sin este problema, tienes dos caminos:
+
+1. **Recomendado para probarlo tú mismo:** corre `npm run test:headed`, que abre una ventana real de Chromium (esto no dispara la detección).
+2. **La prueba "oficial" de que corre headless de verdad:** revisa la corrida en GitHub Actions (link abajo). Ahí el pipeline resuelve esto ejecutando el navegador dentro de un framebuffer virtual (Xvfb): es headed desde el punto de vista de Chrome (nunca manda la bandera que el sitio detecta), pero no hay ninguna ventana visible en el runner ni intervención humana — cumple igual el requisito de "headless / sin supervisión".
+
 ## Cómo correr las pruebas
 
 ```bash
-# Modo headless (por defecto, sin ventana visible)
+# Modo headless (por defecto, solo Chromium — puede ser bloqueado en tu red, ver arriba)
 npm test
 
-# Modo headed (con ventana visible del navegador, útil para depurar)
+# Modo headed (con ventana visible del navegador, recomendado para correrlo en local)
 npm run test:headed
 
-# Solo en Chromium (más rápido, es el navegador principal del proyecto)
-npm run test:chromium
+# Los 3 navegadores configurados (Chromium, Firefox, WebKit) en headless
+npm run test:all-browsers
 
 # Modo UI de Playwright (interfaz visual para ver y depurar los tests paso a paso)
 npm run test:ui
@@ -58,15 +69,6 @@ Después de correr las pruebas, para ver el reporte HTML con el detalle de cada 
 ```bash
 npm run report
 ```
-
-### Una aclaración importante sobre el modo headless
-
-Liverpool.com.mx usa **Akamai Bot Manager**, y en las pruebas que hice durante el desarrollo confirmé que bloquea a Chromium cuando corre en modo `--headless` nativo (responde "Access Denied" directo, sin importar el user-agent ni otros ajustes anti-detección). En modo headed no hay ningún problema.
-
-Por eso, si corres `npm test` en tu máquina y el sitio te bloquea, es un comportamiento esperado y está documentado a detalle en `TEST_STRATEGY.md`. Para verlo funcionar sin este problema tienes dos opciones:
-
-- Correrlo en modo headed: `npm run test:headed`.
-- Revisar la corrida en GitHub Actions (ver sección de abajo), donde el pipeline resuelve esto corriendo el navegador dentro de un framebuffer virtual (Xvfb) — headed desde el punto de vista de Chrome, pero sin ninguna ventana visible en el runner.
 
 ## Variables de entorno
 
