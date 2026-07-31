@@ -15,6 +15,7 @@ dist/
 
 # Internal planning notes - not part of the challenge deliverables
 docs/internal/
+scripts/exploration/
 
 # OS / editor
 .DS_Store

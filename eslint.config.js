@@ -37,6 +37,7 @@ module.exports = tseslint.config(
       'test-results/**',
       'allure-results/**',
       'allure-report/**',
+      'scripts/exploration/**',
     ],
   },
   prettierConfig,
