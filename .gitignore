@@ -1,0 +1,22 @@
+node_modules/
+dist/
+
+# Playwright artifacts
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/allure-results/
+/allure-report/
+
+# Env files (never commit real secrets/config)
+.env
+.env.local
+
+# Internal planning notes - not part of the challenge deliverables
+docs/internal/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
