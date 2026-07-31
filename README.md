@@ -120,3 +120,4 @@ npm run format        # formatea el código con Prettier
 ## Documento de estrategia
 
 Las decisiones de qué automatizar, qué no y por qué, los riesgos de flakiness detectados (y cómo se mitigaron), y qué cambiaría para meter esto en un pipeline de CI con 50+ suites más, están en **[`TEST_STRATEGY.md`](./TEST_STRATEGY.md)**.
+## By Meabellamy
