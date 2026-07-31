@@ -29,11 +29,11 @@ jobs:
 
       # liverpool.com.mx usa Akamai Bot Manager y bloquea a Chromium cuando
       # corre en modo "headless" nativo (--headless), sin importar el user
-      # agent o los flags anti-deteccion (lo confirmamos a fondo en
-      # docs/internal/EXPLORATION.md). La solucion estandar de la industria
-      # para este escenario es correr el navegador en modo headed dentro de
-      # un framebuffer virtual (Xvfb): no hay ninguna ventana visible en el
-      # runner, pero Chrome nunca manda la bandera que el sitio detecta.
+      # agent o los flags anti-deteccion (detalle completo en TEST_STRATEGY.md).
+      # La solucion estandar de la industria para este escenario es correr el
+      # navegador en modo headed dentro de un framebuffer virtual (Xvfb): no
+      # hay ninguna ventana visible en el runner, pero Chrome nunca manda la
+      # bandera que el sitio detecta.
       - name: Instalar Xvfb
         run: sudo apt-get update && sudo apt-get install -y xvfb
 
