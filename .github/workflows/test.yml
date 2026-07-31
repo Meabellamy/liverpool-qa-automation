@@ -1,0 +1,63 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Instalar navegadores de Playwright (Chromium)
+        run: npx playwright install --with-deps chromium
+
+      # liverpool.com.mx usa Akamai Bot Manager y bloquea a Chromium cuando
+      # corre en modo "headless" nativo (--headless), sin importar el user
+      # agent o los flags anti-deteccion (lo confirmamos a fondo en
+      # docs/internal/EXPLORATION.md). La solucion estandar de la industria
+      # para este escenario es correr el navegador en modo headed dentro de
+      # un framebuffer virtual (Xvfb): no hay ninguna ventana visible en el
+      # runner, pero Chrome nunca manda la bandera que el sitio detecta.
+      - name: Instalar Xvfb
+        run: sudo apt-get update && sudo apt-get install -y xvfb
+
+      - name: Preparar variables de entorno
+        run: cp .env.example .env
+
+      - name: Correr las pruebas E2E (dentro de Xvfb)
+        run: xvfb-run --auto-servernum -- npx cross-env HEADED=true playwright test --project=chromium
+        env:
+          CI: true
+
+      - name: Subir reporte HTML de Playwright
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Subir resultados de tests (screenshots, videos, traces en fallos)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 14
+          if-no-files-found: ignore
