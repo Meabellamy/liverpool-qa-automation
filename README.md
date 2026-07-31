@@ -26,57 +26,45 @@ Los detalles de por qué se tomó cada decisión (selectores, el endpoint de red
 - Node.js 20 o superior.
 - npm (viene con Node).
 
-## Instalación
+## Instalación y ejecución rápida (recomendado para probarlo tú mismo)
 
 ```bash
 git clone https://github.com/Meabellamy/liverpool-qa-automation.git
 cd liverpool-qa-automation
 npm install
 npx playwright install --with-deps
-```
+cp .env.example .env
 
-El último comando descarga los navegadores que usa Playwright (Chromium, Firefox y WebKit). Solo hace falta correrlo una vez.
-
-## ⚠️ Antes de correr las pruebas, lee esto
-
-Liverpool.com.mx usa **Akamai Bot Manager**, y durante el desarrollo confirmé que bloquea a Chromium específicamente cuando corre en modo `--headless` nativo (responde "Access Denied" directo, sin importar el user-agent ni otros ajustes anti-detección). En modo headed no hay ningún problema.
-
-Esto significa que si corres el comando headless (`npm test`) **desde tu propia máquina/red**, es muy probable que el sitio te bloquee — es un comportamiento del WAF de Liverpool, no un bug del framework, y está documentado a detalle en `TEST_STRATEGY.md`.
-
-Para verlo pasar sin este problema, tienes dos caminos:
-
-1. **Recomendado para probarlo tú mismo:** corre `npm run test:headed`, que abre una ventana real de Chromium (esto no dispara la detección).
-2. **La prueba "oficial" de que corre headless de verdad:** revisa la corrida en GitHub Actions (link abajo). Ahí el pipeline resuelve esto ejecutando el navegador dentro de un framebuffer virtual (Xvfb): es headed desde el punto de vista de Chrome (nunca manda la bandera que el sitio detecta), pero no hay ninguna ventana visible en el runner ni intervención humana — cumple igual el requisito de "headless / sin supervisión".
-
-## Cómo correr las pruebas
-
-```bash
-# Modo headless (por defecto, solo Chromium — puede ser bloqueado en tu red, ver arriba)
-npm test
-
-# Modo headed (con ventana visible del navegador, recomendado para correrlo en local)
 npm run test:headed
-
-# Los 3 navegadores configurados (Chromium, Firefox, WebKit) en headless
-npm run test:all-browsers
-
-# Modo UI de Playwright (interfaz visual para ver y depurar los tests paso a paso)
-npm run test:ui
 ```
 
-Después de correr las pruebas, para ver el reporte HTML con el detalle de cada test:
+`npx playwright install --with-deps` descarga los navegadores (solo hace falta una vez). El comando que de verdad importa es el último: **`npm run test:headed`**. Corre las 2 pruebas en Chromium con una ventana real del navegador, imprime en consola los 5 resultados extraídos y el resultado del cruce contra la respuesta de red interceptada.
+
+Para ver el reporte HTML con el detalle (pasos, capturas, video, trace) de esa corrida:
 
 ```bash
 npm run report
 ```
 
-## Variables de entorno
+## ⚠️ Importante: no corras `npm test` en tu máquina local
 
-El proyecto no tiene ningún valor hardcodeado en el código: todo lo que puede cambiar entre corridas vive en variables de entorno, con valores por default razonables si no las defines.
+Liverpool.com.mx usa **Akamai Bot Manager**, y confirmé que bloquea a Chromium específicamente cuando corre en modo `--headless` nativo (responde "Access Denied" directo, sin importar el user-agent ni otros ajustes anti-detección). En modo headed no hay ningún problema.
+
+`npm test` (headless, el modo por defecto que pide el challenge) va a fallar si lo corres desde tu red doméstica/oficina — no es un bug del framework, es el WAF del sitio bloqueando cualquier Chromium headless real, sin importar de quién sea. Está documentado a detalle en `TEST_STRATEGY.md`. Por eso, para probar el proyecto en tu máquina, usa siempre `npm run test:headed` (arriba).
+
+La prueba de que sí corre headless de verdad, sin intervención humana, es el pipeline de GitHub Actions (badge y link abajo): ahí se resuelve ejecutando el navegador dentro de un framebuffer virtual (Xvfb) — headed desde el punto de vista de Chrome, pero sin ninguna ventana visible en el runner.
+
+## Otros comandos disponibles
 
 ```bash
-cp .env.example .env
+npm test                    # headless, solo Chromium — el que corre en CI, no recomendado en local (ver arriba)
+npm run test:all-browsers   # los 3 navegadores configurados (Chromium, Firefox, WebKit), headless
+npm run test:ui             # modo UI de Playwright, para depurar paso a paso
 ```
+
+## Variables de entorno
+
+El proyecto no tiene ningún valor hardcodeado en el código: todo lo que puede cambiar entre corridas vive en variables de entorno (el `cp .env.example .env` del paso de instalación), con valores por default razonables si no las defines.
 
 | Variable | Para qué sirve | Valor por default |
 |---|---|---|
